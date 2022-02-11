@@ -1,11 +1,12 @@
 <template>
-  <form>
+  <form @submit.prevent="handleSubmit">
 
     <label>Email</label>
     <input type="email" required v-model="email">
 
     <label>Password</label>
     <input type="password" required v-model="password">
+    <div v-if="passwordError" class="error"> {{ passwordError }}</div>
 
     <label>Role:</label>
     <select v-model="role">
@@ -27,6 +28,10 @@
       <label>Accept terms and conditions</label>
     </div>
 
+    <div class="submit">
+      <button>Create an account</button>
+    </div>
+
   </form>
   <p>Email: {{ email }}</p>
   <p>Password: {{ password }}</p>
@@ -43,18 +48,36 @@ export default {
       role: 'developer',
       terms: false,
       tempSkill: '',
-      skills: []
+      skills: [],
+      passwordError: ''
     }
   },
   methods: {
     addSkill(e) {
       if (e.key === ',' && this.tempSkill) {
-        this.skills.push(this.tempSkill.substring(0, this.tempSkill.length-1))
+        if (!this.skills.includes(this.tempSkill.substring(0, this.tempSkill.length-1))) {
+          this.skills.push(this.tempSkill.substring(0, this.tempSkill.length-1))
+        }
         this.tempSkill = ''
       }
     },
     removeSkill(skill) {
-      this.skills.splice(this.skills.indexOf(skill), 1)
+      this.skills = this.skills.filter((item) => {
+        return skill !== item
+      })
+    },
+    handleSubmit() {
+      // password validation
+      this.passwordError = this.password.length > 5 
+      ? '' : 'Password must be atleast 6 chars long'
+
+      if (!this.passwordError) {
+        console.log('email: ', this.email)
+        console.log('password: ', this.password)
+        console.log('role: ',this.role)
+        console.log('skills: ', this.skills)
+        console.log('terms accepted: ', this.terms)
+      }
     }
   }
 }
@@ -105,6 +128,7 @@ input[type="checkbox"] {
   padding: 5px 10px;
   border-radius: 15px;
   color: rgb(34, 130, 255);
+  letter-spacing: 1px;
   display: flex;
   align-items: center;
 }
@@ -112,5 +136,23 @@ input[type="checkbox"] {
   margin-left: 10px;
   font-size: 20px;
   cursor: pointer;
+}
+.submit {
+  text-align: center;
+  margin-top: 20px;
+}
+.submit button {
+  background: rgb(34, 130, 255);
+  border: none;
+  border-radius: 5px;
+  color: white;
+  padding: 15px 25px;
+  font-size: 18px;
+}
+.error {
+  color: #ff0062;
+  margin-top: 10px;
+  font-size: 0.8em;
+  font-weight: bold;
 }
 </style>
